@@ -1,0 +1,47 @@
+Implement a depth search algorithm and build the grid chierarchy.
+Entry points:
+	- bootstrap container(actually container might not be needed)
+	- body.bootstrap_rows
+	- body.bootstrap_columns
+	
+	
+//Find all and map to unique property some temp Id maybe so I can map the generted grid to the underlying original
+	// Problem Z-indexing which is a child of which
+	
+//Perform a depth search of each body element and check for class then construct an overlay grid mapping to underlying content with unique property 
+//This would enable me to implement the spy glass feature later on(the spy glass feature migth or should(think this over) be separate from the grid overlay.
+//by property mapping will enable me to manipulate the content for preview feature
+
+//Options:
+- Show bs grid
+	- manipulate grid(add/remove rows and columns)
+	- detect dynamic grid by mapping page to physical file(cshtml, php, etc.)
+	- show only rows
+	- show only cols
+	- detect poor syntax like row and col on one element or row/col class to other than div
+	
+	-check for <meta name="viewport" content="width=device-width, initial-scale=1"> if no show warning.
+	-get container or container fluid if not found show warnign message for poor syntax.
+		- check if container first thing in body else warning
+		
+		
+	- always include:
+	
+		<!DOCTYPE html>
+		<html lang="en">
+		  <head>
+			<meta charset="utf-8">
+		  </head>
+		</html>
+		
+		
+- map page to physical file (html, cshtml or other)
+	- ignore dynamic content(mark it with meta content to recognize in page)
+	- mask non grid content with visibility:hidden -- 
+	
+- detect mouse hovering at cell edges
+	- set css with onhover highlighting
+	- from js elementsFromPoint(x, y)
+	
+	- algorithm: get mouse coordinates. search through upper level nodes, if upper level node contains coordinates dig down repeat until pointed node found.
+- set modes(all, large, medium, small)
