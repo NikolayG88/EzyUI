@@ -25,13 +25,12 @@ var gridWorker = (function(){
 		return [];
 	};
 
-	function _maskElement(node){
+	function _maskNonBSElement(node){
 		node.style.visibility = 'hidden';
 		node.style.border = 'none';
 	};
 
-	function _maskColumn(col, colLvl){
-		//col.style.backgroundColor = document.levelColorBase[colLvl >= document.levelColorBase.length ? document.levelColorBase.length - 1 : colLvl] ;
+	function _maskBSColumn(col, colLvl){
 		col.style.border = '1px solid ' + document.levelColorBase[colLvl >= document.levelColorBase.length ? document.levelColorBase.length - 1 : colLvl];
 		col.style.visibility = 'visible';
 		col.style.cursor = 'pointer';
@@ -56,10 +55,11 @@ var gridWorker = (function(){
 		}
 		
 		if(_isBSColumn(node)){
-			 _maskColumn(node, colLvl);
+			 _maskBSColumn(node, colLvl);
+			 
 			 colLvl++;
 		}else{
-			_maskElement(node);
+			_maskNonBSElement(node);
 		}
 		
 		for(var i = 0; i < node.children.length; i++){
@@ -74,6 +74,8 @@ var gridWorker = (function(){
 	
 	return {
 		each: undefined,
+		eachRow: undefined,
+		eachColumn: undefined,
 		maskGrid: _maskGrid
 	};
 	
