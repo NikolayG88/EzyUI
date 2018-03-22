@@ -1,5 +1,47 @@
 //Min versions: G:8, E:10, FF:3.6, S:5.1, O: 11.5
 
+var deviceProfile = (function(){
+	//TODO: actively get current selected device profile
+
+	return {
+		screenProfile: "md"//Medium
+	};
+
+})();
+
+var gridContext = (function(){
+
+	function _ContextMenuItem(label, handler){
+		this.listItem = document.createElement("li");
+		this.listItem.innerHTML = label;
+		this.listItem.addEventListener("click", handler);
+	}
+
+	return {
+		column: {
+			menuItems: [
+				new _ContextMenuItem("Insert Rows", function(row){
+					console.log("Inserting rows");
+				}),
+
+				new _ContextMenuItem("Insert Columns", function(column){
+					console.log("Inserting columns");
+				})
+			]
+		}
+	};
+
+}());
+
+
+function GridColumn(domNode){
+	if(domNode == null){
+		throw "Invalid constructor parameter: DOM node is null !";
+	}
+
+	//TODO: Detect grid system and set menu items 
+	this.node = domNode;
+}
 
 //TODO: put this in a separate file gridWorker.js and inject it from the bg script
 var gridWorker = (function(){
@@ -36,6 +78,14 @@ var gridWorker = (function(){
 		col.style.cursor = 'pointer';
 	};
 
+	function _addColumn(node){
+
+	}
+
+	function _addRow(node){
+
+	}
+
 	var that = undefined;
 	function _maskGrid (node, colLvl){
 		
@@ -59,7 +109,7 @@ var gridWorker = (function(){
 		if(_isBSColumn(node)){
 			 _maskBSColumn(node, colLvl);
 			 if(that.eachColumn != undefined){
-				 that.eachColumn(node);
+				 that.eachColumn(new GridColumn(node));
 			 }
 			 colLvl++;
 		}else{
@@ -80,18 +130,21 @@ var gridWorker = (function(){
 		each: undefined,
 		eachRow: undefined,
 		eachColumn: undefined,
-		maskGrid: _maskGrid
+		
+		maskGrid: _maskGrid,
+
+		addRow:_addRow,
+		addColumn: _addColumn
 	};
 }());
 
-var bsGridContextMenu = (function(){
+var gridContextMenu = (function(){
 	//TODO: count columns and distribute the sizes evenly
-	
+	console.log("context menu object built");
 	var colContextMenu = undefined;
 	
-	var colMenuHtml = `
-		<style>
-			#colContextMenu{
+	var colMenuStyle = 
+		`#colContextMenu{
 				position:fixed;
 				visibility:visible;
 				width:200px;
@@ -127,28 +180,31 @@ var bsGridContextMenu = (function(){
 				margin-left:5px;
 				margin-right:5px;
 				margin-bottom:5px;
-			}
+			}`;
 			
-		</style>
-		<div>
-			<ul>
-				<li>Insert Rows</li>
-				<hr />
-				<li>Insert Columns</li>
-				<hr />
-			</ul>
-		</div>`;
-
+	
+	
 	function _openColMenu(event){
-		
+	
 		try{
 			if(colContextMenu == undefined){
 				colContextMenu = document.createElement("div");
+				
+				var list = document.createElement("ul");
+				
+				for(var i = 0; i < gridContext.column.menuItems.length; i++){
+					var li = gridContext.column.menuItems[i].listItem;
+					li.appendChild(document.createElement("hr"));
+					list.appendChild(li); 
+				}
 
-				colContextMenu.innerHTML = colMenuHtml;
+				colContextMenu.appendChild(list);
+
 				colContextMenu.id = "colContextMenu";
 				colContextMenu.style.visibility = "visible";
-
+				var elmStyle = document.createElement("style");
+				elmStyle.innerHTML = colMenuStyle;
+				document.body.appendChild(elmStyle);
 				document.body.appendChild(colContextMenu);
 
 				window.onclick = function(evt){
@@ -163,19 +219,20 @@ var bsGridContextMenu = (function(){
 			colContextMenu.style.top = event.clientY + 'px';
 			colContextMenu.style.left = event.clientX + 'px';
 
-			
 			event.stopPropagation();
 		}catch(err){
 			console.log(err.message);
 		}
 	};
 	
+	//Event mask
 	function _onColContextMenuMask(event){
 		event.preventDefault();
 		_openColMenu(event);
-	}
+	};
 	
 	return {
+		menuOptions: undefined,
 		onColContextMenuMask: _onColContextMenuMask
 	};
 	
@@ -195,17 +252,8 @@ var bsGridContextMenu = (function(){
   
 	var nodeIdx = 0;
 
-	gw.eachColumn = function(colNode){
-		colNode.oncontextmenu = bsGridContextMenu.onColContextMenuMask;
-		if(colNode.id != "" && colNode.id >= nodeIdx){
-			console.log("Duplicate node " + colNode.id);
-		}
-		else{
-			colNode.id = nodeIdx;
-			nodeIdx++;
-		}
-		
-		//console.log(colNode);
+	gw.eachColumn = function(column){
+		column.node.oncontextmenu = gridContextMenu.onColContextMenuMask;
 	};
 	gw.maskGrid();
 	
@@ -213,7 +261,7 @@ var bsGridContextMenu = (function(){
 	 * Listen for messages from the background script.
 	 */
 	browser.runtime.onMessage.addListener((message) => {
-	alert(message);
+		alert(message);
 	});
 
 })();
