@@ -30,12 +30,24 @@ const bg =`body{
 		browser.tabs.insertCSS({code: bg});
 		//browser.tabs.insertCSS({code: hLightGrid});
 		//browser.tabs.insertCSS({code: overlay});
-		
 		browser.tabs.executeScript({file: "/content_scripts/jquery.js"});
-		browser.tabs.executeScript({file: "/content_scripts/ezyui.js"});
+
+		browser.tabs.executeScript({file: "/content_scripts/ezyui.js"}).then(function(){
+			browser.tabs.executeScript({file: "/content_scripts/grid.js"}).then(function(){
+				browser.tabs.executeScript({file: "/content_scripts/grid_worker.js"}).then(function(){
+					browser.tabs.executeScript({file: "/content_scripts/context_menu.js"}).then(function(){
+						browser.tabs.executeScript({file: "/content_scripts/content_init.js"});
+					});
+					
+				});
+			});
+		});
+		
+		
+		
 		
 		function reportError(error) {
-			console.error(`Could not beastify: ${error}`);
+			console.error(error);
 		}
 	});
 })();
