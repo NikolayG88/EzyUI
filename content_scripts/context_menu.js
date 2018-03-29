@@ -50,7 +50,7 @@ function ContextMenu(){
 			}`;
 			
     
-	function _openColMenu(event){	
+	var _openColMenu = (event) => {	
 		try{
 			if(colContextMenu == undefined){
 				colContextMenu = document.createElement("div");
@@ -91,31 +91,29 @@ function ContextMenu(){
 	};
 	
 	//Event mask
-	this.onColContextMenuMask = function(event){
+	this.onColContextMenuMask = (event) => {
 		event.preventDefault();
 		_openColMenu(event);
 	};
 }
 
 function GridContextMenu(grid){
-	var source = new ContextMenu();
+	var base = new ContextMenu();
     
-    source.menuItems = source.menuItems.concat([
-        new ContextMenuItem("Insert Rows", function(row){
-            grid.addRow();
-            grid.someFunc();
+    base.menuItems = base.menuItems.concat([
+        new ContextMenuItem("Insert Rows", (row) => {
+			//TODO: Figure out the way that a new column and row would be added
         }),
 
-        new ContextMenuItem("Insert Columns", function(column){
-            grid.addCol();
-            grid.someFunc();
+        new ContextMenuItem("Insert Columns", (column) => {
+            
         })
 	]);
 	
-	Object.assign(this, source);
+	Object.assign(this, base);
 }
 
 function BSGridContextMenu(bsgrid){
-	var source  = new GridContextMenu(bsgrid);
-	Object.assign(this, source);
+	var base  = new GridContextMenu(bsgrid);
+	Object.assign(this, base);
 }

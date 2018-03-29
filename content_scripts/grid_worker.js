@@ -1,7 +1,9 @@
 gridWorker = (function(){
 
+	// var levelColorBase = ['#C2561A', '#DA611E', '#F16C20', '#F58A4B'];
+	var grid = new BSGrid();
 	function _isBSRow(node){
-		var regex = RegExp('^row\s|\row\s');
+		var regex = RegExp('row');
 		return regex.test(node.className);
 	};
 
@@ -27,48 +29,68 @@ gridWorker = (function(){
 	};
 
 	function _maskBSColumn(col, colLvl){
-		col.style.border = '1px solid ' + document.levelColorBase[colLvl >= document.levelColorBase.length ? document.levelColorBase.length - 1 : colLvl];
-		col.style.visibility = 'visible';
-		col.style.cursor = 'pointer';
+		// var lvlColor = levelColorBase[colLvl >= levelColorBase.length ? levelColorBase.length - 1 : colLvl];
+		// col.style.border = '1px solid ' + lvlColor;
+		// col.style.visibility = 'visible';
+		// col.style.cursor = 'pointer';
+		// col.addEventListener("mouseover", function(e){
+		// 	e.stopPropagation(); 
+		// 	col.style.backgroundColor = lvlColor;
+		// });
+
+		// col.addEventListener("mouseout", function(e){
+		// 	col.style.backgroundColor = 'unset';
+		// });
 	};
 
 	var that = undefined;
 	function _maskGrid (node, colLvl){
-		
-		if(that == undefined){
-			that = this;
-		}
-		
-		if(that.each != undefined){
-			that.each(node);
-		}
-		
-		if(node == undefined){
-			_maskGrid(document.body, colLvl);
-			return;
-		}
-		
-		if(colLvl == undefined){
-			colLvl = 0;
-		}
-		
-		if(_isBSColumn(node)){
-			 _maskBSColumn(node, colLvl);
-			 if(that.eachColumn != undefined){
-				 that.eachColumn(new GridColumn(node));
-			 }
-			 colLvl++;
-		}else{
-			_maskNonBSElement(node);
-		}
-		
-		for(var i = 0; i < node.children.length; i++){
+		try{
+			if(that == undefined){
+				that = this;
+			}
 			
-			_maskGrid(node.children[i], colLvl);
-		}
-		
-		if(_isBSColumn(node)){
-			 colLvl--;
+			if(that.each != undefined){
+				that.each(node);
+			}
+			
+			if(node == undefined){
+				_maskGrid(document.body, colLvl);
+				return;
+			}
+			
+			if(colLvl == undefined){
+				colLvl = 0;
+			}
+			
+			if(_isBSColumn(node)){
+				//_maskBSColumn(node, colLvl);
+				var col = new GridColumn(node);
+				var row = grid.getLastRow();
+
+				row.addCol(col);
+
+				if(that.eachColumn != undefined){
+					that.eachColumn(col, colLvl);
+				}
+				colLvl++;
+			}else if(_isBSRow(node)){
+				var row = new BSGridRow(node);
+				grid.addRow(row);
+			}else{
+				_maskNonBSElement(node);
+			}
+			
+			for(var i = 0; i < node.children.length; i++){
+				
+				_maskGrid(node.children[i], colLvl);
+			}
+			
+			if(_isBSColumn(node)){
+				colLvl--;
+			}
+		}catch(err){
+			console.log(err);
 		}
 	};
     

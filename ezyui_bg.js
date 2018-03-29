@@ -8,10 +8,9 @@ const overlay = `.col-overlay {
 	opacity:0.5;
 }`;
 
-const hLightGrid = `[class*=col-]{
-		background-color:lightskyblue;
+const hLightGrid = `[class*=col-]:hover{
+		background-color:orange;
 		opacity:0.5;
-		border: 1px solid grey;
 	}`;
 
 	

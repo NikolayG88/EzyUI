@@ -15,8 +15,6 @@ var deviceProfile = (function(){
     
     window.hasRun = true;
 
-	document.levelColorBase = ['#C2561A', '#DA611E', '#F16C20', '#F58A4B'];
- 
   	var gw = gridWorker;
   
 	var nodeIdx = 0;
