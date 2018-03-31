@@ -103,6 +103,7 @@ function GridContextMenu(grid){
     base.menuItems = base.menuItems.concat([
         new ContextMenuItem("Insert Rows", (row) => {
 			//TODO: Figure out the way that a new column and row would be added
+			//Add grid worker action state
         }),
 
         new ContextMenuItem("Insert Columns", (column) => {

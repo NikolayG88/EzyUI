@@ -13,6 +13,16 @@ const hLightGrid = `[class*=col-]:hover{
 		opacity:0.5;
 	}`;
 
+const style = `
+	[class*=col-]:hover{
+		opacity:0.8;
+		transition:background-color 0.5s;
+	}
+	[class*=row]:hover{
+		opacity:0.8;
+		transition:background-color 0.5s;
+	}
+`;
 	
 const bg =`body{
 		background-color:"#1f232d";
@@ -27,6 +37,7 @@ const bg =`body{
 	browser.browserAction.onClicked.addListener((e) => {
 		
 		browser.tabs.insertCSS({code: bg});
+		browser.tabs.insertCSS({code: style});
 		//browser.tabs.insertCSS({code: hLightGrid});
 		//browser.tabs.insertCSS({code: overlay});
 		browser.tabs.executeScript({file: "/content_scripts/jquery.js"});
@@ -35,7 +46,9 @@ const bg =`body{
 			browser.tabs.executeScript({file: "/content_scripts/grid.js"}).then(function(){
 				browser.tabs.executeScript({file: "/content_scripts/grid_worker.js"}).then(function(){
 					browser.tabs.executeScript({file: "/content_scripts/context_menu.js"}).then(function(){
-						browser.tabs.executeScript({file: "/content_scripts/content_init.js"});
+						browser.tabs.executeScript({file: "/content_scripts/state.js"}).then(function(){
+							browser.tabs.executeScript({file: "/content_scripts/content_init.js"});
+						});
 					});
 					
 				});

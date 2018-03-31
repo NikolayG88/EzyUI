@@ -19,12 +19,12 @@ var deviceProfile = (function(){
   
 	var nodeIdx = 0;
 	
-	var gridContextMenu = new GridContextMenu(gw.buildGrid());
+	var gridContextMenu = new GridContextMenu(gw.getGrid());
 	gw.eachColumn = function(column){
-		column.node.oncontextmenu = gridContextMenu.onColContextMenuMask;
+		column.getNode().oncontextmenu = gridContextMenu.onColContextMenuMask;
 	};
 	gw.maskGrid();
-	
+	gw.getGrid().setState(new DefaultState())
 	/**
 	 * Listen for messages from the background script.
 	 */
