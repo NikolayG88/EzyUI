@@ -11,6 +11,52 @@ function GridRow(domNode){
 		throw "Invalid constructor parameter: DOM node is null !";
     }
 
+    this.getNode = () => {
+        return node;
+    };
+
+    this.hasNode = () => {
+        return node == undefined || node == null;
+    };
+
+    this.setLevel = (lvl) => {
+        level = lvl;
+    };
+
+    this.setId = (newId) => {
+        _id = newId
+    };
+
+    this.getId = () => {
+        return _id;
+    };
+
+    this.hasChild = (item) => {
+        return children.find((element) => {
+            return element.getId() == item.getId();
+        }) != undefined;
+    };
+}
+
+function GridColumn(domNode) {
+    var base = new GridItem(domNode);
+
+    domNode.style.border = '1px solid white';
+    domNode.style.visibility = 'visible';
+    domNode.style.cursor = 'pointer';
+    domNode.style.padding = '5px';
+    Object.assign(this, base);
+}
+
+function BSGridColumn(node) {
+    var base = new GridColumn(node);
+    Object.assign(this, base);
+}
+
+function GridRow(domNode) {
+    var base = new GridItem(domNode);
+    Object.assign(this, base);
+
     var levelColorBase = ['#C2561A', '#DA611E', '#F16C20', '#F58A4B'];
     
     this.level = undefined;
