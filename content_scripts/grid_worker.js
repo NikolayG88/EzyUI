@@ -1,7 +1,5 @@
-gridWorker = (function(){
-
-	// var levelColorBase = ['#C2561A', '#DA611E', '#F16C20', '#F58A4B'];
-	var gridBuilder = (function(){
+gridWorker = (() => {
+	var gridBuilder = (() => {
 
 		//TODO: Detect selected grid system
 		var grid = new BSGrid();
@@ -14,79 +12,104 @@ gridWorker = (function(){
 			return new BSGridColumn(node);
 		};
 
+		var hasChildren = (node) => {
+			for (var child in node.children) {
+				if (grid.isRow(node) || grid.isColumn(node)) {
+					return true;
+				}
+			}
+		};
+
+		var addItemRecursive = (item) => {
+
+			//Validate grid structure
+			var head = grid.getHead();
+			if(head != null){
+				if(head.isType("GridRow") && item.isType("GridRow")){
+					console.log("Warning: Impropper syntax, row can not be a child of another row !");
+				}else if(head.isType("GridColumn") && item.isType("GridColumn")){
+					console.log("Warning: Impropper syntax, column can not be a child of another column !");
+				}
+			}
+			
+			grid.addItemRecursive(item);
+		}
+
 		return {
 			grid: grid,
 			newRow: newRow,
-			newCol: newCol
+			newCol: newCol,
+			hasChildren: hasChildren,
+			addItemRecursive: addItemRecursive
 		}
 	})();
 
 	var that = undefined;
-	function _maskGrid (node, colLvl){
-		try{
-			if(that == undefined){
+	function _maskGrid(node, colLvl) {
+		try {
+
+			if (that == undefined) {
 				that = this;
 			}
-			
-			if(that.each != undefined){
+
+			if (that.each != undefined) {
 				that.each(node);
 			}
-			
-			if(node == undefined){
+
+			if (node == undefined) {
 				_maskGrid(document.body, colLvl);
 				return;
 			}
-			
-			if(colLvl == undefined){
-				colLvl = 0;
-			}
-			
-			if(gridBuilder.grid.isColumn(node)){
-				
+
+			var newItem = null;
+
+			if (gridBuilder.grid.isColumn(node)) {
+
 				var col = gridBuilder.newCol(node);
-				//var row = gridBuilder.grid.getLastRow();
-				gridBuilder.grid.addItemRecursive(col);
-				//row.addChild(col);
-				
-				if(that.eachColumn != undefined){
+				newItem = col;
+
+				if (that.eachColumn != undefined) {
 					that.eachColumn(col, colLvl);
 				}
-				colLvl++;
-			}else if(gridBuilder.grid.isRow(node)){
+
+			} else if (gridBuilder.grid.isRow(node)) {
 				var row = gridBuilder.newRow(node);
-				gridBuilder.grid.addItemRecursive(row);
-			}else{
+				newItem = row;
+			} else {
 				gridBuilder.grid.maskNonGridElement(node);
 			}
-			
-			for(var i = 0; i < node.children.length; i++){
+
+			if (newItem != null) {
+				gridBuilder.addItemRecursive(newItem);
+
+				if (gridBuilder.hasChildren(node)) {
+					gridBuilder.grid.down(newItem);
+				}
+			}
+
+			for (var i = 0; i < node.children.length; i++) {
 				_maskGrid(node.children[i], colLvl);
 			}
-			
-			if(gridBuilder.grid.isColumn(node)|| gridBuilder.grid.isRow(node)){
+
+			if (gridBuilder.grid.isColumn(node) || gridBuilder.grid.isRow(node)) {
 				gridBuilder.grid.up();
-				colLvl--;
 			}
-		}catch(err){
+		} catch (err) {
 			console.log(err);
 		}
 	};
-    
-	function _parseGrid(gridItem){
 
-	}
-	
-    function _getGrid(){
+	function _getGrid() {
 		//TODO: detect layout system and build the grid object as required
-        return gridBuilder.grid;
-    }
+		return gridBuilder.grid;
+	}
 
 	return {
 		each: undefined,
 		eachRow: undefined,
 		eachColumn: undefined,
-		
+
 		maskGrid: _maskGrid,
-		getGrid: _getGrid 
+		getGrid: _getGrid
 	};
-}());
+})();

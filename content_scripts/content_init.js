@@ -1,4 +1,4 @@
-var deviceProfile = (function(){
+var deviceProfile = (function () {
 	//TODO: actively get current selected device profile
 
 	return {
@@ -7,20 +7,20 @@ var deviceProfile = (function(){
 
 })();
 
-(function() {
-    
-    if (window.hasRun) {
-        return;
-    }
-    
-    window.hasRun = true;
+(function () {
 
-  	var gw = gridWorker;
-  
+	if (window.hasRun) {
+		return;
+	}
+
+	window.hasRun = true;
+
+	var gw = gridWorker;
+
 	var nodeIdx = 0;
-	
+
 	var gridContextMenu = new GridContextMenu(gw.getGrid());
-	gw.eachColumn = function(column){
+	gw.eachColumn = function (column) {
 		column.getNode().oncontextmenu = gridContextMenu.onColContextMenuMask;
 	};
 	gw.maskGrid();

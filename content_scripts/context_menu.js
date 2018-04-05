@@ -1,16 +1,16 @@
 
-function ContextMenuItem(label, handler){
+function ContextMenuItem(label, handler) {
 	this.listItem = document.createElement("li");
 	this.listItem.innerHTML = label;
 	this.listItem.addEventListener("click", handler);
 }
 
-function ContextMenu(){
-    this.menuItems = [];
-    var thisInst = this;
-    var colContextMenu = undefined;
-	
-	var menuStyle = 
+function ContextMenu() {
+	this.menuItems = [];
+	var thisInst = this;
+	var colContextMenu = undefined;
+
+	var menuStyle =
 		`#colContextMenu{
 				position:fixed;
 				visibility:visible;
@@ -48,19 +48,19 @@ function ContextMenu(){
 				margin-right:5px;
 				margin-bottom:5px;
 			}`;
-			
-    
-	var _openColMenu = (event) => {	
-		try{
-			if(colContextMenu == undefined){
+
+
+	var _openColMenu = (event) => {
+		try {
+			if (colContextMenu == undefined) {
 				colContextMenu = document.createElement("div");
-				
+
 				var list = document.createElement("ul");
-				
-				for(var i = 0; i < thisInst.menuItems.length; i++){
+
+				for (var i = 0; i < thisInst.menuItems.length; i++) {
 					var li = thisInst.menuItems[i].listItem;
 					li.appendChild(document.createElement("hr"));
-					list.appendChild(li); 
+					list.appendChild(li);
 				}
 
 				colContextMenu.appendChild(list);
@@ -72,24 +72,24 @@ function ContextMenu(){
 				document.body.appendChild(elmStyle);
 				document.body.appendChild(colContextMenu);
 
-				window.onclick = function(evt){
-					if(evt.button == 0){
+				window.onclick = function (evt) {
+					if (evt.button == 0) {
 						colContextMenu.style.visibility = "hidden";
 					}
 				};
-			}else{
-				colContextMenu.style.visibility = "visible"; 
+			} else {
+				colContextMenu.style.visibility = "visible";
 			}
-			
+
 			colContextMenu.style.top = event.clientY + 'px';
 			colContextMenu.style.left = event.clientX + 'px';
 
 			event.stopPropagation();
-		}catch(err){
+		} catch (err) {
 			console.log(err.message);
 		}
 	};
-	
+
 	//Event mask
 	this.onColContextMenuMask = (event) => {
 		event.preventDefault();
@@ -97,24 +97,24 @@ function ContextMenu(){
 	};
 }
 
-function GridContextMenu(grid){
+function GridContextMenu(grid) {
 	var base = new ContextMenu();
-    
-    base.menuItems = base.menuItems.concat([
-        new ContextMenuItem("Insert Rows", (row) => {
+
+	base.menuItems = base.menuItems.concat([
+		new ContextMenuItem("Insert Rows", (row) => {
 			//TODO: Figure out the way that a new column and row would be added
 			//Add grid worker action state
-        }),
+		}),
 
-        new ContextMenuItem("Insert Columns", (column) => {
-            
-        })
+		new ContextMenuItem("Insert Columns", (column) => {
+			grid.setState(new AddColState());
+		})
 	]);
-	
+
 	Object.assign(this, base);
 }
 
-function BSGridContextMenu(bsgrid){
-	var base  = new GridContextMenu(bsgrid);
+function BSGridContextMenu(bsgrid) {
+	var base = new GridContextMenu(bsgrid);
 	Object.assign(this, base);
 }

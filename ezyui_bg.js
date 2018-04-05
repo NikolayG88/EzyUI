@@ -16,48 +16,48 @@ const hLightGrid = `[class*=col-]:hover{
 const style = `
 	[class*=col-]:hover{
 		opacity:0.8;
-		transition:background-color 0.5s;
+		transition:background-color 0.5s, opacity 0.5s;
 	}
 	[class*=row]:hover{
 		opacity:0.8;
-		transition:background-color 0.5s;
+		transition:background-color 0.5s, opacity 0.5s;
 	}
 `;
-	
-const bg =`body{
+
+const bg = `body{
 		background-color:"#1f232d";
-	}`; 
+	}`;
 /**
  * Listen for clicks on the buttons, and send the appropriate message to
  * the content script in the page.
  */
-(function() {
-	
+(function () {
+
 	//execute when the toolbar button is clicked
 	browser.browserAction.onClicked.addListener((e) => {
-		
-		browser.tabs.insertCSS({code: bg});
-		browser.tabs.insertCSS({code: style});
+
+		browser.tabs.insertCSS({ code: bg });
+		browser.tabs.insertCSS({ code: style });
 		//browser.tabs.insertCSS({code: hLightGrid});
 		//browser.tabs.insertCSS({code: overlay});
-		browser.tabs.executeScript({file: "/content_scripts/jquery.js"});
+		browser.tabs.executeScript({ file: "/content_scripts/jquery.js" });
 
-		browser.tabs.executeScript({file: "/content_scripts/ezyui.js"}).then(function(){
-			browser.tabs.executeScript({file: "/content_scripts/grid.js"}).then(function(){
-				browser.tabs.executeScript({file: "/content_scripts/grid_worker.js"}).then(function(){
-					browser.tabs.executeScript({file: "/content_scripts/context_menu.js"}).then(function(){
-						browser.tabs.executeScript({file: "/content_scripts/state.js"}).then(function(){
-							browser.tabs.executeScript({file: "/content_scripts/content_init.js"});
+		browser.tabs.executeScript({ file: "/content_scripts/ezyui.js" }).then(function () {
+			browser.tabs.executeScript({ file: "/content_scripts/grid.js" }).then(function () {
+				browser.tabs.executeScript({ file: "/content_scripts/grid_worker.js" }).then(function () {
+					browser.tabs.executeScript({ file: "/content_scripts/context_menu.js" }).then(function () {
+						browser.tabs.executeScript({ file: "/content_scripts/state.js" }).then(function () {
+							browser.tabs.executeScript({ file: "/content_scripts/content_init.js" });
 						});
 					});
-					
+
 				});
 			});
 		});
-		
-		
-		
-		
+
+
+
+
 		function reportError(error) {
 			console.error(error);
 		}
@@ -69,9 +69,9 @@ const bg =`body{
  * Display the popup's error message, and hide the normal UI.
  */
 function reportExecuteScriptError(error) {
- // document.querySelector("#popup-content").classList.add("hidden");
- // document.querySelector("#error-content").classList.remove("hidden");
-  console.error(`Failed to execute ezyui content script: ${error.message}`);
+	// document.querySelector("#popup-content").classList.add("hidden");
+	// document.querySelector("#error-content").classList.remove("hidden");
+	console.error(`Failed to execute ezyui content script: ${error.message}`);
 }
 
 

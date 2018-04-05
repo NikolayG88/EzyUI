@@ -8,11 +8,17 @@ function GridItem(domNode) {
     var parent = null;
     var node = domNode;
     var children = [];
+    var itemType = "";
+    var lvlColor = null;
 
     this.addChild = (gridItem) => {
         gridItem.setLevel(level + 1);
         children.push(gridItem);
         gridItem.setParent(this);
+    };
+
+    this.getChildren = () => {
+        return children;
     };
 
     this.setParent = (item) => {
@@ -35,8 +41,13 @@ function GridItem(domNode) {
         level = lvl;
     };
 
+    this.getLevel = () => {
+        return level;
+    }
+
     this.setId = (newId) => {
         _id = newId
+        node.id = _id;
     };
 
     this.getId = () => {
@@ -48,16 +59,61 @@ function GridItem(domNode) {
             return element.getId() == item.getId();
         }) != undefined;
     };
+
+    this.isType = (type) => {
+        return itemType === type;
+    };
+
+    this.setType = (type) => {
+        itemType = type;
+    };
+
+    var itemEvents = {
+        mouseover: [ /*callbacks: []*/],
+        mouseout: [ /*callbacks: []*/]
+    };
+
+    this.addEventListener = (name, callback) => {
+        itemEvents[name].push(callback);
+        node.addEventListener(name, (event) => {
+            try {
+                //var cbacks = itemEvents[name];
+                for (var cback in itemEvents[name]) {
+                    itemEvents[name][cback](event, this);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+
+        });
+    };
+
+    this.removeEventListener = (name, callback) => {
+
+        var idx = itemEvents[name].indexOf(callback);
+
+        if (idx >= 0) {
+            itemEvents[name].splice(idx, 1);
+        }
+    };
+    this.levelColors = [];
+    this.getLevelColor = () => {
+        return this.levelColors[level >= this.levelColors.length ? this.levelColors.length - 1 : level];
+    }
 }
 
-function GridColumn(domNode) {
-    var base = new GridItem(domNode);
+function GridColumn(node) {
+    var base = new GridItem(node);
 
-    domNode.style.border = '1px solid white';
-    domNode.style.visibility = 'visible';
-    domNode.style.cursor = 'pointer';
-    domNode.style.padding = '5px';
     Object.assign(this, base);
+    this.setType("GridColumn");
+
+    base.levelColors = ['#C2561A', '#DA611E', '#F16C20', '#F58A4B'];
+
+    node.style.border = '1px solid ' + this.getLevelColor();
+    node.style.visibility = 'visible';
+    node.style.cursor = 'pointer';
+    node.style.padding = '5px';
 }
 
 function BSGridColumn(node) {
@@ -65,77 +121,30 @@ function BSGridColumn(node) {
     Object.assign(this, base);
 }
 
-function GridRow(domNode) {
-    var base = new GridItem(domNode);
+function GridRow(node) {
+    var base = new GridItem(node);
     Object.assign(this, base);
-
-    var levelColorBase = ['#C2561A', '#DA611E', '#F16C20', '#F58A4B'];
-
-    var level = undefined;
-
-    domNode.style.border = '1px solid #800000';
-    domNode.style.visibility = 'visible';
-    domNode.style.cursor = 'pointer';
-    domNode.style.backgroundColor = "transparent";
-    domNode.style.padding = '5px';
-
+    this.setType("GridRow");
 
     this.addChild = (col) => {
-        var lvlColor = levelColorBase[level >= levelColorBase.length ? levelColorBase.length - 1 : level];
-        // col.getNode().style.border = '1px solid ' + lvlColor;
-        // col.getNode().style.visibility = 'visible';
-        // col.getNode().style.cursor = 'pointer';
-        // col.getNode().style.padding = '5px';
-
-
-        col.getNode().addEventListener("mouseover", function (e) {
-            e.stopPropagation();
-            col.getNode().style.backgroundColor = lvlColor;
-        });
-
-        col.getNode().addEventListener("mouseout", function (e) {
-            col.getNode().style.backgroundColor = 'unset';
-        });
 
         base.addChild(col);
-        //columns.push(col);
     };
 
-    // this.addCol = (col) => {
+    base.levelColors = ['#800000', '#911111', '#9D1D1D', '#A72727'];
 
-    //     var lvlColor = levelColorBase[level >= levelColorBase.length ? levelColorBase.length - 1 : level];
-    //     col.getNode().style.border = '1px solid ' + lvlColor;
-    //     col.getNode().style.visibility = 'visible';
-    //     col.getNode().style.cursor = 'pointer';
-    //     col.getNode().style.padding = '5px';
-
-
-    //     col.getNode().addEventListener("mouseover", function(e){
-    //         e.stopPropagation(); 
-    //         col.getNode().style.backgroundColor = lvlColor;
-    //     });
-
-    //     col.getNode().addEventListener("mouseout", function(e){
-    //         col.getNode().style.backgroundColor = 'unset';
-    //     });
-
-    //     columns.push(col);
-
-    // };
-
-    this.setLevel = (lvl) => {
-        level = lvl;
-    };
-
-    this.getLevel = () => {
-        return level;
-    };
+    node.style.backgroundColor = "transparent";
+    node.style.border = '1px solid' + this.getLevelColor();
+    node.style.visibility = 'visible';
+    node.style.cursor = 'pointer';
+    node.style.padding = '5px';
 }
 
-function BSGridRow(domNode) {
-    var gridRow = new GridRow(domNode);
+function BSGridRow(node) {
+    var gridRow = new GridRow(node);
 
     Object.assign(this, gridRow);
+
     this.addChild = (col) => {
         if (col.hasNode()) {
             //Create new dom node
@@ -143,6 +152,8 @@ function BSGridRow(domNode) {
             gridRow.addChild(col);
         }
     };
+
+
 }
 
 function Grid() {
@@ -150,9 +161,14 @@ function Grid() {
     var index = 0;
     var root = null;
     var head = null;
+    var gridState = null;
 
     this.resetHead = () => {
         head = root;
+    };
+
+    this.getHead = () => {
+        return head;
     };
 
     this.addItemRecursive = (item) => {
@@ -162,24 +178,24 @@ function Grid() {
         item.setId(index);
 
         if (root == null) {
-            console.log("add root with Id: " + index);
             root = item;
             head = root;
         } else {
-            console.log("add item id: " + index + " to head id: " + head.getId());
             head.addChild(item);
-            this.down(item);
         }
     };
 
     this.up = () => {
-        if (!head.getParent() == null) {
+        if (head.getParent() != null) {
             head = head.getParent();
         }
     };
 
     this.down = (item) => {
-        console.log("change head to item id: " + item.getId());
+        if (head == item) {
+            return;
+        }
+
         if (!head.hasChild(item)) {
             throw "Invalid argument, target grid item must be a child of the current head !";
         }
@@ -226,10 +242,36 @@ function Grid() {
     };
 
     this.setState = (state) => {
+        try {
+
+            forEach(null, (item) => {
+
+                if (gridState != null) {
+                    gridState.clearState(item);
+                }
+
+                state.operation(item);
+            });
+
+            gridState = state;
+        } catch (err) {
+            console.log(err);
+        }
 
     };
-}
 
+    function forEach(item, callback) {
+        if (item == null) {
+            item = root;
+        }
+
+        callback(item);
+
+        for (var i = 0; i < item.getChildren().length; i++) {
+            forEach(item.getChildren()[i], callback);
+        }
+    }
+}
 
 function BSGrid() {
     var base = new Grid();
